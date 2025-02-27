@@ -1,4 +1,3 @@
-
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
@@ -9,7 +8,13 @@ import "@openzeppelin/contracts/utils/Base64.sol";
 contract SVG_NFT is ERC721 {
     uint256 private _nextTokenId;
 
-    string private constant SVG_IMAGE = 'https://cdn.prod.website-files.com/6615636a03a6003b067c36dd/661ffd0dbe9673d914edca2d_6423fc9ca8b5e94da1681a70_Screenshot%25202023-03-29%2520at%252010.53.43.jpeg';
+    string private constant SVG_IMAGE = 
+        '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200">'
+        '<rect width="100%" height="100%" fill="black"/>'
+        '<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="20">'
+        'On-Chain NFT'
+        '</text>'
+        '</svg>';
 
     constructor() ERC721("SVG NFT", "SVGNFT") {
         _nextTokenId = 1;
@@ -21,27 +26,26 @@ contract SVG_NFT is ERC721 {
         return tokenId;
     }
 
-    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
         if (ownerOf(tokenId) == address(0)) {
             revert("ERC721Metadata: URI query for nonexistent token");
         }
 
+        // Base64-encode the SVG image
         string memory base64EncodedSVG = Base64.encode(bytes(SVG_IMAGE));
 
-        return string(
-            abi.encodePacked(
-                'data:application/json;base64,',
-                Base64.encode(
-                    bytes(
-                        abi.encodePacked(
-                            '{"name":"SVG NFT #', Strings.toString(tokenId), '",',
-                            '"description":"An NFT with on-chain SVG image",',
-                            '"image":"data:image/svg+xml;base64,', base64EncodedSVG, '",',
-                            '"attributes":[]}'
-                        )
-                    )
+        // Construct metadata JSON and encode it
+        string memory json = Base64.encode(
+            bytes(
+                abi.encodePacked(
+                    '{"name":"SVG NFT #', Strings.toString(tokenId), '",',
+                    '"description":"An on-chain SVG NFT",',
+                    '"image":"data:image/svg+xml;base64,', base64EncodedSVG, '",',
+                    '"attributes":[]}'
                 )
             )
         );
+
+        return string(abi.encodePacked("data:application/json;base64,", json));
     }
 }

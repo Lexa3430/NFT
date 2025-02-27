@@ -5,3 +5,4 @@ export default buildModule("DeploySVG_NFT", (m) => {
 
     return { svgNft };
 });
+
